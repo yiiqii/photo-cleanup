@@ -82,14 +82,15 @@ module.exports = async function (cwd) {
           destLocPath = path.join(destDatePath, name);
         } else {
           const answers = await inquirer.prompt(choosePois(`${filePath} ${lat},${lng}`, pois));
+          let locName;
 
           if (answers.pois) {
             const poi = answers.pois.split('=>')[0];
-            const locName = `${moment(dateTime.replace(/:/g, '')).format('YYYY.MM.DD')}${poi}`;
 
+            locName = `${moment(dateTime.replace(/:/g, '')).format('YYYY.MM.DD')}${poi}`;
             destLocPath = path.join(destDatePath, locName);
-            setRegeoCache(lat, lng, locName);
           }
+          setRegeoCache(lat, lng, locName);
         }
       }
 

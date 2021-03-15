@@ -29,15 +29,16 @@ function getRegeoByCoordinate(lat, lng) {
           reject(error);
         } else {
           const ret = JSON.parse(body);
-          const { formatted_address: formattedAddress, addressComponent, pois = [] } = _.get(ret, 'regeocode', {});
+          const { formatted_address: formattedAddress, addressComponent = {}, pois = [] } = _.get(ret, 'regeocode', {});
           const { district, city, township } = addressComponent;
 
           pois.push({ name: '' });
-          pois.push({ name: formattedAddress });
-          pois.push({
-            name: district,
-            type: `${city},${township}`,
-          });
+          formattedAddress && pois.push({ name: formattedAddress });
+          district &&
+            pois.push({
+              name: district,
+              type: `${city},${township}`,
+            });
 
           resolve({
             lat,
