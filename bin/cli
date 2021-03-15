@@ -1,0 +1,20 @@
+#!/usr/bin/env node
+
+const program = require('commander');
+const pkg = require('../package.json');
+
+program
+  .version(pkg.version)
+  .usage('<command> [options]'.green);
+
+if (!process.argv.slice(2).length) {
+  program.help();
+}
+
+program.parse(process.argv);
+
+(async () => {
+  const fold = Array.prototype.slice.call(process.argv, 2)[0];
+
+  await require(`../src/index`)(fold);
+})();

@@ -1,0 +1,55 @@
+{
+  "name": "photo-cleanup",
+  "version": "1.0.0",
+  "description": "Cleanup your photos by Model/Date/Location",
+  "bin": {
+    "photo-cleanup": "./bin/cli"
+  },
+  "scripts": {
+    "lint": "eslint src && npm run lint:prettier",
+    "lint:fix": "eslint src --fix && npm run lint:prettier:fix",
+    "lint:prettier": "prettier --config ./.prettierrc.json --list-different src/**/**/*.js",
+    "lint:prettier:fix": "prettier --config ./.prettierrc.json --write src/**/**/*.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yiiqii/photo-cleanup.git"
+  },
+  "engineStrict": true,
+  "engines": {
+    "install-node": "^10.22.1"
+  },
+  "author": "yiiqii",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/yiiqii/photo-cleanup/issues"
+  },
+  "homepage": "https://github.com/yiiqii/photo-cleanup#readme",
+  "dependencies": {
+    "chalk": "^4.1.0",
+    "commander": "^7.1.0",
+    "exiftool-vendored": "^14.0.0",
+    "fs-extra": "^9.1.0",
+    "glob": "^7.1.6",
+    "inquirer": "^8.0.0",
+    "lodash": "^4.17.21",
+    "moment": "^2.29.1",
+    "request": "^2.88.2",
+    "shelljs": "^0.8.4"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "npm run lint"
+    }
+  },
+  "devDependencies": {
+    "babel-eslint": "^10.1.0",
+    "eslint": "^7.22.0",
+    "eslint-config-standard": "^16.0.2",
+    "eslint-plugin-import": "^2.22.1",
+    "eslint-plugin-node": "^11.1.0",
+    "eslint-plugin-promise": "^4.3.1",
+    "husky": "^5.1.3",
+    "prettier": "^2.2.1"
+  }
+}
