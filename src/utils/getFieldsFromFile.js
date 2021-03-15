@@ -9,7 +9,6 @@ function getFieldsFromFile(filePath) {
     exiftool
       .read(filePath)
       .then((tags) => {
-        console.log(tags);
         const { GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, Make, Model, UserComment } = tags;
         const { Lat, Lng } = cleanExifLocationData({
           GPSLatitudeRef,
