@@ -76,10 +76,10 @@ module.exports = async function (cwd) {
 
       // 3.5. List the coordinate
       if (result.Lat && result.Lng) {
-        const { name, lat, lng, pois } = await getRegeoByCoordinate(result.Lat, result.Lng);
+        const { name, lat, lng, pois, isCache } = await getRegeoByCoordinate(result.Lat, result.Lng);
 
-        if (name) {
-          destLocPath = path.join(destDatePath, name);
+        if (isCache || name) {
+          destLocPath = path.join(destDatePath, name || '');
         } else {
           const answers = await inquirer.prompt(choosePois(`${filePath} ${lat},${lng}`, pois));
           let locName;

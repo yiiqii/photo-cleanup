@@ -21,6 +21,7 @@ function getRegeoByCoordinate(lat, lng) {
   return new Promise((resolve, reject) => {
     const cache = checkCache(lat, lng);
 
+    console.log(cache);
     if (cache.length) {
       resolve(cache[0]);
     } else {
@@ -80,6 +81,7 @@ function setRegeoCache(lat, lng, name) {
       lat,
       lng,
       name,
+      isCache: true,
     });
   }
 }
