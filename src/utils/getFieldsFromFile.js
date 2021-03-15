@@ -1,4 +1,6 @@
 const _ = require('lodash');
+const fs = require('fs-extra');
+const moment = require('moment');
 const { exiftool } = require('exiftool-vendored');
 const { cleanExifLocationData } = require('../utils');
 
@@ -7,7 +9,7 @@ function getFieldsFromFile(filePath) {
     exiftool
       .read(filePath)
       .then((tags) => {
-        // console.log(tags);
+        console.log(tags);
         const { GPSLatitudeRef, GPSLatitude, GPSLongitudeRef, GPSLongitude, Make, Model, UserComment } = tags;
         const { Lat, Lng } = cleanExifLocationData({
           GPSLatitudeRef,
@@ -19,9 +21,16 @@ function getFieldsFromFile(filePath) {
         const DateTimeOriginal = _.get(tags, 'DateTimeOriginal.rawValue');
         const CreateDate = _.get(tags, 'CreateDate.rawValue');
         const DateCreated = _.get(tags, 'DateCreated.rawValue');
+        let DateTime = CreationDate || DateTimeOriginal || CreateDate || DateCreated;
+
+        if (!DateTime) {
+          const { birthtime } = fs.statSync(filePath);
+
+          DateTime = moment(birthtime).format('YYYY:MM:DD hh:mm:ss');
+        }
 
         resolve({
-          DateTime: CreationDate || DateTimeOriginal || CreateDate || DateCreated,
+          DateTime,
           Lat,
           Lng,
           Make,

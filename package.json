@@ -1,6 +1,6 @@
 {
   "name": "photo-cleanup",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Cleanup your photos by Model/Date/Location",
   "bin": {
     "photo-cleanup": "./bin/cli"

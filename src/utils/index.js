@@ -41,7 +41,7 @@ function promiseExec(command, rejectValue, resolveValue) {
         } else {
           resolve(resolveValue || stdout);
         }
-      },
+      }
     );
   }).catch((e) => {
     return new Error(e);

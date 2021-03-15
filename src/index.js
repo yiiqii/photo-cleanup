@@ -27,13 +27,15 @@ module.exports = async function (cwd) {
   });
   let len = files.length;
 
+  hint('info', `Glob file count: ${len}`);
+
   // 3. Traverse all files
   for (const file of files) {
     let result;
     const filePath = path.join(fromPath, file);
 
     // 3.1. Filter
-    if (/\.(png|mov|jpg|jpeg|heic|mp4)$/gi.test(file)) {
+    if (/\.(png|mov|jpg|jpeg|heic|heif|mp4)$/gi.test(file)) {
       fileCount++;
       // 3.2. Get fields
       result = await getFieldsFromFile(filePath);
@@ -111,6 +113,8 @@ module.exports = async function (cwd) {
       fs.copySync(filePath, destFilePath);
       hint('success', `${filePath} => ${destFilePath}`);
       // console.log(file, 'https://amap.com/?q=' + result.Lat + ',' + result.Lng);
+    } else {
+      hint('error', `Can not recognize file type: ${filePath}`);
     }
 
     len--;
@@ -122,5 +126,5 @@ module.exports = async function (cwd) {
     // console.log(file, result);
   }
 
-  hint('info', `file count: ${fileCount}`);
+  hint('info', `Traverse file count: ${fileCount}`);
 };
