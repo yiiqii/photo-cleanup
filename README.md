@@ -22,7 +22,7 @@ $ photo-cleanup <fold>
 
 ``` bash
 # Compare parts
-$ photo-cleanup compare <fold>
+$ photo-cleanup compare <fold1> <fold2>
 ```
 
 ## License
