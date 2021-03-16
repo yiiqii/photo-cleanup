@@ -10,7 +10,7 @@ let token;
 
 function getRegeoByCoordinate(lat, lng) {
   if (!token) {
-    [path.join(os.homedir(), tokenFile), path.join(process.cwd(), tokenFile)].forEach(function (file) {
+    [path.join(os.homedir(), tokenFile), path.join(process.cwd(), tokenFile)].forEach(function(file) {
       if (fs.existsSync(file)) {
         token = fs.readFileSync(file, 'utf8').trim();
       }
@@ -21,7 +21,6 @@ function getRegeoByCoordinate(lat, lng) {
   return new Promise((resolve, reject) => {
     const cache = checkCache(lat, lng);
 
-    console.log(cache);
     if (cache.length) {
       resolve(cache[0]);
     } else {
@@ -30,13 +29,16 @@ function getRegeoByCoordinate(lat, lng) {
           reject(error);
         } else {
           const ret = JSON.parse(body);
-          const { formatted_address: formattedAddress, addressComponent = {}, pois = [] } = _.get(ret, 'regeocode', {});
+          const { formatted_address: formattedAddress, addressComponent = {}, aois = [], pois = [] } = _.get(ret, 'regeocode', {});
           const { district, city, township } = addressComponent;
+          let locs = aois.concat(pois);
 
-          pois.push({ name: '' });
-          formattedAddress && pois.push({ name: formattedAddress });
+          if (formattedAddress) {
+            locs = [{ name: formattedAddress }].concat(locs);
+          }
+
           district &&
-            pois.push({
+            locs.push({
               name: district,
               type: `${city},${township}`,
             });
@@ -44,8 +46,7 @@ function getRegeoByCoordinate(lat, lng) {
           resolve({
             lat,
             lng,
-            formattedAddress,
-            pois: _.map(pois, (n) => {
+            pois: _.map(locs, (n) => {
               return _.pick(n, 'name', 'type');
             }),
           });

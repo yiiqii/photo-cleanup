@@ -3,7 +3,7 @@ const inquirer = require('inquirer');
 const glob = require('glob');
 const fs = require('fs-extra');
 const moment = require('moment');
-const { choosePois } = require('./questions');
+const { chooseLoc, typeInLoc } = require('./questions');
 const { hint } = require('./utils');
 const { getFieldsFromFile, shutdownToolProcess } = require('./utils/getFieldsFromFile');
 const { getRegeoByCoordinate, setRegeoCache } = require('./utils/getRegeoByCoordinate');
@@ -11,7 +11,7 @@ const { getRegeoByCoordinate, setRegeoCache } = require('./utils/getRegeoByCoord
 const dateHash = moment().format('YYYYMMDD');
 let fileCount = 0;
 
-module.exports = async function (cwd) {
+module.exports = async function(cwd) {
   const fromPath = path.join(process.cwd(), cwd);
   const destPath = path.join(process.cwd(), dateHash);
 
@@ -81,13 +81,22 @@ module.exports = async function (cwd) {
         if (isCache || name) {
           destLocPath = path.join(destDatePath, name || '');
         } else {
-          const answers = await inquirer.prompt(choosePois(`${filePath} ${lat},${lng}`, pois));
+          hint(`=> Loc by map [${file}]: https://amap.com/?q=${lat},${lng}`);
+
+          const { choosedLoc } = await inquirer.prompt(chooseLoc(`Choose Loc: ${filePath} lat: ${lat} lng: ${lng}`, pois));
+          let loc = choosedLoc;
           let locName;
 
-          if (answers.pois) {
-            const poi = answers.pois.split('=>')[0];
+          if (choosedLoc) {
+            if (choosedLoc === 'input') {
+              const { typedLoc } = await inquirer.prompt(typeInLoc('Type in Loc:'));
 
-            locName = `${moment(dateTime.replace(/:/g, '')).format('YYYY.MM.DD')}${poi}`;
+              if (typedLoc) {
+                loc = typedLoc;
+              }
+            }
+
+            locName = `${moment(dateTime.replace(/:/g, '')).format('YYYY.MM.DD')}${loc}`;
             destLocPath = path.join(destDatePath, locName);
           }
           setRegeoCache(lat, lng, locName);
@@ -99,23 +108,30 @@ module.exports = async function (cwd) {
       }
 
       // 3.6. Check Model and create model fold
+      // 如果源存在目录，认为已归类好，不再细分 Model
+      const oBasename = path.dirname(filePath.replace(fromPath, '')).replace(/[\s|/]*/ig, '');
       if (model) {
         if (destLocPath) {
           destModelPath = path.join(destLocPath, model);
         } else {
           destModelPath = path.join(destDatePath, model);
         }
-        fs.ensureDirSync(destModelPath);
+        if (oBasename === '') {
+          fs.ensureDirSync(destModelPath);
+        }
       }
 
       // 3.7. Copy
-      const destFilePath = path.join(destModelPath || destLocPath || destDatePath, file);
+      let foldPath = destModelPath || destLocPath || destDatePath;
+      if (oBasename) {
+        foldPath = destLocPath || destDatePath;
+      }
+      const destFilePath = path.join(foldPath, file);
 
       fs.copySync(filePath, destFilePath);
       hint('success', `${filePath} => ${destFilePath}`);
-      // console.log(file, 'https://amap.com/?q=' + result.Lat + ',' + result.Lng);
     } else {
-      hint('error', `Can not recognize file type: ${filePath}`);
+      hint(`Can not recognize file type: ${filePath}`);
     }
 
     len--;
@@ -124,7 +140,6 @@ module.exports = async function (cwd) {
     if (len === 0) {
       shutdownToolProcess();
     }
-    // console.log(file, result);
   }
 
   hint('info', `Traverse file count: ${fileCount}`);
