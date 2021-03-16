@@ -1,15 +1,19 @@
 const _ = require('lodash');
 
-const preChoices = [
+const preLocChoices = [
   { name: 'None', value: '' },
   { name: 'Type in a name', value: 'input' },
+];
+
+const preDuplcateChoices = [
+  { name: 'None', value: '' },
 ];
 
 const chooseLoc = (message, locs) => [{
   type: 'list',
   name: 'choosedLoc',
   message,
-  choices: _.map(preChoices.concat(locs), p => {
+  choices: _.map(preLocChoices.concat(locs), p => {
     const name = p.type ? `${p.name}=>[${p.type}]` : p.name;
     const value = _.isUndefined(p.value) ? p.name : p.value;
     return {
@@ -31,7 +35,21 @@ const typeInLoc = (message) => [{
   },
 }];
 
+const chooseDuplcateFile = (message, files) => [{
+  type: 'list',
+  name: 'choosedFile',
+  message,
+  choices: preDuplcateChoices.concat(_.map(files, file => ({
+    name: file,
+    value: file,
+  }))),
+  default: () => {
+    return '';
+  },
+}];
+
 module.exports = {
   chooseLoc,
   typeInLoc,
+  chooseDuplcateFile,
 };

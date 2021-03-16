@@ -1,11 +1,33 @@
 #!/usr/bin/env node
 
 const program = require('commander');
+const _ = require('lodash');
+const chalk = require('chalk');
 const pkg = require('../package.json');
+const commands = require('../config/commands');
 
 program
   .version(pkg.version)
   .usage('<command> [options]'.green);
+
+const argvs = Array.prototype.slice.call(process.argv, 2);
+const isCommands = _.intersection(_.map(commands, 'name'), argvs).length !== 0;
+
+if (isCommands) {
+  for (const opt of commands) {
+    const cmd = program
+      .command(opt.name, '', { noHelp: opt.noHelp })
+      .description(chalk.yellow(opt.description));
+
+    (opt.options || []).forEach((o) => {
+      cmd.option(o.name, o.description, o.defaultValue);
+    });
+
+    cmd.action(() => {
+      doCommand(argvs, cmd);
+    });
+  }
+}
 
 if (!process.argv.slice(2).length) {
   program.help();
@@ -13,8 +35,17 @@ if (!process.argv.slice(2).length) {
 
 program.parse(process.argv);
 
-(async () => {
-  const fold = Array.prototype.slice.call(process.argv, 2)[0];
+if (!isCommands) {
+  (async () => {
+    const fold = Array.prototype.slice.call(process.argv, 2)[0];
 
-  await require(`../src/index`)(fold);
-})();
+    await require('../src/index')(fold);
+  })();
+}
+
+async function doCommand(argvs, cmd) {
+  const [com] = argvs;
+  const { args } = cmd;
+
+  await require(`../src/${com}`)(args);
+}
