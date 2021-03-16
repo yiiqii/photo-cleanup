@@ -17,12 +17,12 @@ $ npm i photo-cleanup -g
 
 ``` bash
 # Organize files
-$ photo-cleanup <fold>
+$ photo-cleanup <fold> <?destFold>
 ```
 
 ``` bash
 # Compare parts
-$ photo-cleanup compare <fold1> <fold2>
+$ photo-cleanup compare <fold1> <?fold2>
 ```
 
 ## License
