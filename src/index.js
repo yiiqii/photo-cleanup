@@ -76,30 +76,35 @@ module.exports = async function([cwd, dest]) {
 
       // 3.5. List the coordinate
       if (result.Lat && result.Lng) {
-        const { name, lat, lng, pois, isCache } = await getRegeoByCoordinate(result.Lat, result.Lng);
+        const locResult = await getRegeoByCoordinate(result.Lat, result.Lng);
+        const { name, lat, lng, pois, isCache } = locResult;
 
-        if (isCache || name) {
-          destLocPath = path.join(destDatePath, name || '');
+        if (locResult instanceof Error) {
+          hint('warn', locResult.message);
         } else {
-          hint(`=> Loc by map [${file}]: https://amap.com/?q=${lat},${lng}`);
+          if (isCache || name) {
+            destLocPath = path.join(destDatePath, name || '');
+          } else {
+            hint(`=> Loc by map [${file}]: https://amap.com/?q=${lat},${lng}`);
 
-          const { choosedLoc } = await inquirer.prompt(chooseLoc(`Choose Loc: ${filePath} lat: ${lat} lng: ${lng}`, pois));
-          let loc = choosedLoc;
-          let locName;
+            const { choosedLoc } = await inquirer.prompt(chooseLoc(`Choose Loc: ${filePath} lat: ${lat} lng: ${lng}`, pois));
+            let loc = choosedLoc;
+            let locName;
 
-          if (choosedLoc) {
-            if (choosedLoc === 'input') {
-              const { typedLoc } = await inquirer.prompt(typeInLoc('Type in Loc:'));
+            if (choosedLoc) {
+              if (choosedLoc === 'input') {
+                const { typedLoc } = await inquirer.prompt(typeInLoc('Type in Loc:'));
 
-              if (typedLoc) {
-                loc = typedLoc;
+                if (typedLoc) {
+                  loc = typedLoc;
+                }
               }
-            }
 
-            locName = `${moment(dateTime.replace(/:/g, '')).format('YYYY.MM.DD')}${loc}`;
-            destLocPath = path.join(destDatePath, locName);
+              locName = `${moment(dateTime.replace(/:/g, '')).format('YYYY.MM.DD')}${loc}`;
+              destLocPath = path.join(destDatePath, locName);
+            }
+            setRegeoCache(lat, lng, locName);
           }
-          setRegeoCache(lat, lng, locName);
         }
       }
 

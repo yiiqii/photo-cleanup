@@ -21,6 +21,10 @@ function getRegeoByCoordinate(lat, lng) {
   return new Promise((resolve, reject) => {
     const cache = checkCache(lat, lng);
 
+    if (!token) {
+      return reject(new Error('No token, i can\'t get the location'));
+    }
+
     if (cache.length) {
       resolve(cache[0]);
     } else {
@@ -54,7 +58,7 @@ function getRegeoByCoordinate(lat, lng) {
       });
     }
   }).catch((e) => {
-    return new Error(e);
+    return e;
   });
 }
 

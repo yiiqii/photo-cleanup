@@ -37,11 +37,11 @@ function getFieldsFromFile(filePath) {
           UserComment,
         });
       })
-      .catch((e) => {
+      .catch(e => {
         reject(e);
       });
-  }).catch((e) => {
-    return new Error(e);
+  }).catch(e => {
+    return e;
   });
 }
 

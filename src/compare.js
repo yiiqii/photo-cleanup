@@ -28,7 +28,7 @@ module.exports = async function(cwds) {
           }
         });
       }).catch(e => {
-        return new Error(e);
+        return e;
       });
     }),
   );
