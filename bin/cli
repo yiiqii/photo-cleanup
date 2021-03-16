@@ -37,9 +37,7 @@ program.parse(process.argv);
 
 if (!isCommands) {
   (async () => {
-    const fold = Array.prototype.slice.call(process.argv, 2)[0];
-
-    await require('../src/index')(fold);
+    await require('../src/index')(argvs);
   })();
 }
 

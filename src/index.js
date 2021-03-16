@@ -11,9 +11,9 @@ const { getRegeoByCoordinate, setRegeoCache } = require('./utils/getRegeoByCoord
 const dateHash = moment().format('YYYYMMDD');
 let fileCount = 0;
 
-module.exports = async function(cwd) {
+module.exports = async function([cwd, dest]) {
   const fromPath = path.join(process.cwd(), cwd);
-  const destPath = path.join(process.cwd(), dateHash);
+  const destPath = path.join(process.cwd(), dest || dateHash);
 
   // 1. Create dest fold
   if (!fs.existsSync(destPath)) {
