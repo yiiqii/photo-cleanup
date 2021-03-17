@@ -65,8 +65,8 @@ function getRegeoByCoordinate(lat, lng) {
 const locCache = [];
 
 function checkCache(lat = 0, lng = 0) {
-  lat = Number(lat).toFixed(1);
-  lng = Number(lng).toFixed(1);
+  lat = Number(lat).toFixed(2);
+  lng = Number(lng).toFixed(2);
 
   const list = _.filter(locCache, { lat, lng });
 
@@ -78,8 +78,8 @@ function checkCache(lat = 0, lng = 0) {
 }
 
 function setRegeoCache(lat, lng, name) {
-  lat = Number(lat).toFixed(1);
-  lng = Number(lng).toFixed(1);
+  lat = Number(lat).toFixed(2);
+  lng = Number(lng).toFixed(2);
 
   if (checkCache(lat, lng).length === 0) {
     locCache.push({
