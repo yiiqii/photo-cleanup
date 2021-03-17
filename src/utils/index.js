@@ -1,6 +1,8 @@
+const path = require('path');
 const chalk = require('chalk');
 const _ = require('lodash');
 const shell = require('shelljs');
+const glob = require('glob');
 
 function hint(type, msg) {
   if (!msg) {
@@ -28,14 +30,34 @@ function checkBrewBinExists(name, installName) {
   return promiseExec(`which ${name}`, `please install ${installName || name}`);
 }
 
+function getAllFilesByFolds(cwds) {
+  return Promise.all(
+    _.map(cwds, cwd => {
+      return new Promise((resolve, reject) => {
+        glob('**', {
+          cwd,
+        }, (er, files) => {
+          if (er) {
+            reject(er);
+          } else {
+            const fromDir = path.join(process.cwd(), cwd);
+            resolve(_.map(files, file => path.join(fromDir, file)));
+          }
+        });
+      }).catch(e => {
+        return e;
+      });
+    }),
+  );
+}
+
 function promiseExec(command, rejectValue, resolveValue) {
-  return new Promise(function (resolve, reject) {
+  return new Promise(function(resolve, reject) {
     require('child_process').exec(
-      command,
-      {
+      command, {
         maxBuffer: 2 * 1024 * 1024,
       },
-      function (error, stdout, stderr) {
+      function(error, stdout, stderr) {
         if (error || stderr) {
           reject(rejectValue || error || stderr);
         } else {
@@ -97,6 +119,7 @@ module.exports = {
   hint,
   doExec,
   promiseExec,
+  getAllFilesByFolds,
   checkBrewBinExists,
   cleanExifLocationData,
 };

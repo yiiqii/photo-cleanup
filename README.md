@@ -26,12 +26,12 @@ Create a file which named `.amap.token` in your Home fold or the current fold, l
 
 ``` bash
 # Organize files
-$ photo-cleanup <fold> <?destFold>
+$ photo-cleanup <fold> [destFold]
 ```
 
 ``` bash
 # Compare parts
-$ photo-cleanup compare <fold1> <?fold2>
+$ photo-cleanup compare <fold> [fold2]
 ```
 
 ## Examples

@@ -12,38 +12,40 @@ program
 
 const argvs = Array.prototype.slice.call(process.argv, 2);
 const isCommands = _.intersection(_.map(commands, 'name'), argvs).length !== 0;
+const examples = _.map(commands, 'examples');
 
-if (isCommands) {
-  for (const opt of commands) {
-    const cmd = program
-      .command(opt.name, '', { noHelp: opt.noHelp })
-      .description(chalk.yellow(opt.description));
+for (const opt of commands) {
+  const cmd = program
+    .command(opt.name, '', _.pick(opt, 'isDefault'))
+    .description(chalk.yellow(opt.description));
 
-    (opt.options || []).forEach((o) => {
-      cmd.option(o.name, o.description, o.defaultValue);
-    });
+  (opt.options || []).forEach(o => {
+    cmd.option(o.name, o.description, o.defaultValue);
+  });
 
-    cmd.action(() => {
-      doCommand(argvs, cmd);
-    });
-  }
+  cmd.action(() => {
+    doCommand(argvs, cmd);
+  });
 }
 
 if (!process.argv.slice(2).length) {
   program.help();
 }
 
-program.parse(process.argv);
+program.addHelpText('after', `
+Examples:
+  $ ${examples.join('\n  $ ')}
+`);
 
-if (!isCommands) {
-  (async () => {
-    await require('../src/index')(argvs);
-  })();
-}
+program.parse(process.argv);
 
 async function doCommand(argvs, cmd) {
   const [com] = argvs;
   const { args } = cmd;
 
-  await require(`../src/${com}`)(args);
+  if (isCommands) {
+    await require(`../src/${com}`)(args, cmd.opts());
+  } else {
+    await require('../src/organize')(args, cmd.opts());
+  }
 }

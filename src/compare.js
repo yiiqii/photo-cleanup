@@ -1,44 +1,25 @@
-const path = require('path');
 const fs = require('fs-extra');
-const glob = require('glob');
 const inquirer = require('inquirer');
 const _ = require('lodash');
 const md5File = require('md5-file');
 const trash = require('trash');
-const { hint } = require('./utils');
+const cliProgress = require('cli-progress');
+const { hint, getAllFilesByFolds } = require('./utils');
 const { chooseDuplcateFile } = require('../config/questions');
 
 module.exports = async function(cwds) {
   const filesArray = [];
+  const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.legacy);
 
   hint('Starting arrange files...');
 
   // 1. Prepare files by folds
-  const files = await Promise.all(
-    _.map(cwds, cwd => {
-      return new Promise((resolve, reject) => {
-        glob('**', {
-          cwd,
-        }, (er, files) => {
-          if (er) {
-            reject(er);
-          } else {
-            const fromDir = path.join(process.cwd(), cwd);
-            resolve(_.map(files, file => path.join(fromDir, file)));
-          }
-        });
-      }).catch(e => {
-        return e;
-      });
-    }),
-  );
+  const files = await getAllFilesByFolds(cwds);
 
   if (files instanceof Error) {
     hint('error', files);
     return;
   }
-
-  hint('Starting detection...');
 
   // 2. Count files and get all files path
   const count = _.reduce(_.flatten(files), (sum, filePath) => {
@@ -50,12 +31,26 @@ module.exports = async function(cwds) {
   }, 0);
 
   hint('info', `Files Count: ${count}`);
+  hint('Detection starting...');
+  progressBar.start(count, 0);
 
   // 3. md5 the files
-  const filesSet = _.map(filesArray, path => ([
-    md5File.sync(path),
-    path,
-  ]));
+  let counter = 1;
+  const filesSet = _.map(filesArray, path => {
+    progressBar.update(counter);
+
+    if (counter === count) {
+      progressBar.stop();
+      hint('Detection finished.');
+    }
+
+    counter++;
+
+    return [
+      md5File.sync(path),
+      path,
+    ];
+  });
   const hashArray = _.map(filesSet, ([hash]) => hash);
   // 4. Get the duplicate items
   const duplicateItems = _.filter(hashArray, (val, i, iteratee) => _.includes(iteratee, val, i + 1));
