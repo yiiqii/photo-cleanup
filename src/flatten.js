@@ -2,10 +2,12 @@ const path = require('path');
 const fs = require('fs-extra');
 const _ = require('lodash');
 const moment = require('moment');
+const cliProgress = require('cli-progress');
 const { hint, getAllFilesByFolds } = require('./utils');
 
 module.exports = async function(cwds, { output }) {
   const filesArray = [];
+  const progressBar = new cliProgress.SingleBar({}, cliProgress.Presets.legacy);
   const dateHash = moment().format('YYYYMMDDHHmmss');
   hint('Starting flatten...');
 
@@ -28,12 +30,22 @@ module.exports = async function(cwds, { output }) {
 
   hint('info', `Files Count: ${count}`);
   hint('Copy starting...');
+  progressBar.start(count, 0);
 
   // 3. Copy
   const destPath = path.join(process.cwd(), output || `flatten${dateHash}[${count}]`);
+  let counter = 1;
 
   for (const file of filesArray) {
     const destFilePath = path.join(destPath, path.basename(file));
+
+    progressBar.update(counter);
+
+    if (counter === count) {
+      progressBar.stop();
+    }
+
+    counter++;
 
     fs.copySync(file, destFilePath);
   }
