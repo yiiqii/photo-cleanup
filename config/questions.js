@@ -48,8 +48,18 @@ const chooseDuplcateFile = (message, files) => [{
   },
 }];
 
+const confirmEmptyFold = (message) => [{
+  type: 'confirm',
+  name: 'emptyFold',
+  message,
+  default: () => {
+    return false;
+  },
+}];
+
 module.exports = {
   chooseLoc,
   typeInLoc,
   chooseDuplcateFile,
+  confirmEmptyFold,
 };

@@ -12,10 +12,14 @@ module.exports = [{
 }, {
   name: 'flatten',
   description: 'Flatten depth folder',
-  examples: 'photo-cleanup flatten <fold> [fold2]',
+  examples: 'photo-cleanup flatten <fold> [fold2] [-o <output>] [-m]',
   options: [{
     name: '-o, --output <fold>',
     description: 'Output directory',
+    defaultValue: '',
+  }, {
+    name: '-m, --move',
+    description: 'Whether Moves file',
     defaultValue: '',
   }],
 }];

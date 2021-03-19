@@ -131,7 +131,14 @@ module.exports = async function([cwd, dest]) {
       if (oBasename) {
         foldPath = destLocPath || destDatePath;
       }
-      const destFilePath = path.join(foldPath, file);
+      let destFilePath = path.join(foldPath, file);
+
+      if (fs.existsSync(destFilePath)) {
+        hint(`The file is exist in: ${destFilePath}`);
+        const newFileName = file.replace(/(.+)\.(\w+)$/i, `$1_${Date.now()}.$2`);
+        hint('warn', `I will rename it to: ${newFileName}`);
+        destFilePath = path.join(foldPath, newFileName);
+      }
 
       fs.copySync(filePath, destFilePath);
       hint('success', `${filePath} => ${destFilePath}`);
